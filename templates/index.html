@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <script src="/iris-ws.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/3.3.6/css/bootstrap.min.css"></link>
+  </head>
+  <body>
+    <div>
+      <table class="table table-bordered" style="margin: 12px; width: 300px">
+      {% for command in commands %}
+        <tr>
+          <td>{{command.name}}</td>
+          <td><button class="btn btn-normal" data-index="{{forloop.Counter0}}">run</button></td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+    <script>
+      Array.from(document.querySelectorAll("button")).forEach(b => {
+        b.addEventListener("click", e => {
+          let n = b.getAttribute("data-index");
+          fetch(`/run/${n}`).then(data => console.log(data))
+        });
+      });
+      let ws = new Ws("ws://public.zodiac.tv:8080/ws");
+      ws.OnConnect(function () {
+          console.log("Websocket connection enstablished");
+      });
+
+      ws.OnDisconnect(function () {
+          // appendMessage($("<div><center><h3>Disconnected</h3></center></div>"));
+      });
+      ws.On("out", function (message) {
+        appendMessage(message);
+      });
+      let appendMessage = msg => {
+        let d = document.createElement('pre');
+        msg = msg.split("\n").map(l => {
+          l = l.split(";");
+          l = l[l.length-1];
+          return l;
+        });
+        d.innerHTML = msg.join('<br>');
+        document.body.appendChild(d)
+      };
+    </script>
+  </body>
+</html>

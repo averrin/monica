@@ -1,0 +1,5 @@
+commands:
+  - name: List files
+    cmd: ls -la
+  - name: Disk free
+    cmd: df -h
