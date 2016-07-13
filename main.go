@@ -39,7 +39,7 @@ func main() {
 }
 
 func index(ctx *iris.Context) {
-	ctx.Render("index.html", map[string]interface{}{"commands": viper.Get("commands")})
+	ctx.Render("index.html", map[string]interface{}{"commands": viper.Get("commands"), "host": ctx.HostString()})
 }
 
 func run(ctx *iris.Context) {
