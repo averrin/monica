@@ -62,7 +62,7 @@ func run(ctx *iris.Context) {
 			t := scanner.Text()
 			fmt.Printf(">>> | %s\n", t)
 			t = t + "\n"
-			sokets[0].To(isis.All).Emit("out", []byte(t))
+			sokets[0].To(iris.All).Emit("out", []byte(t))
 		}
 	}()
 
