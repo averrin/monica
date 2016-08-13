@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/websocket"
 	"github.com/spf13/viper"
+	"github.com/iris-contrib/template/django"
 )
 
-var ws websocket.Server
-var sokets []websocket.Connection
+var ws iris.WebsocketServer
+var sokets []iris.WebsocketConnection
 
 func main() {
 	viper.SetConfigType("yaml")
@@ -26,16 +26,16 @@ func main() {
 	fmt.Println(viper.Get("commands"))
 
 	iris.Static("/js", "./static/js", 1)
-	iris.Config.Render.Template.Engine = iris.PongoEngine
+	iris.UseTemplate(django.New()).Directory("./templates", ".html")
 	iris.Get("/", index)
 	iris.Get("/run/:index", run)
 	iris.Config.Websocket.Endpoint = "/ws"
 	ws = iris.Websocket
-	ws.OnConnection(func(c websocket.Connection) {
+	ws.OnConnection(func(c iris.WebsocketConnection) {
 		sokets = append(sokets, c)
 		c.EmitMessage([]byte("connected"))
 	})
-	iris.Listen("0.0.0.0:8080")
+	iris.Listen("0.0.0.0:80")
 }
 
 func index(ctx *iris.Context) {
@@ -62,11 +62,11 @@ func run(ctx *iris.Context) {
 			t := scanner.Text()
 			fmt.Printf(">>> | %s\n", t)
 			t = t + "\n"
-			sokets[0].To(websocket.All).Emit("out", []byte(t))
+			sokets[0].To(isis.All).Emit("out", []byte(t))
 		}
 	}()
 
-	sokets[0].To(websocket.All).Emit("out", []byte(">>> "+cmdLine))
+	sokets[0].To(iris.All).Emit("out", []byte(">>> "+cmdLine))
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
