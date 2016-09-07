@@ -60,11 +60,15 @@ func run(ctx *iris.Context) {
 			t := scanner.Text()
 			fmt.Printf(">>> | %s\n", t)
 			t = t + "\n"
-			sokets[0].To(iris.All).Emit("out", []byte(t))
+			if len(sokets) > 0 {
+				sokets[0].To(iris.All).Emit("out", []byte(t))
+			}
 		}
 	}()
 
-	sokets[0].To(iris.All).Emit("out", []byte(">>> "+cmdLine))
+	if len(sokets) > 0 {
+		sokets[0].To(iris.All).Emit("out", []byte(">>> "+cmdLine))
+	}
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
