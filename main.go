@@ -7,12 +7,11 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/iris-contrib/template/django"
 	"github.com/kataras/iris"
 	"github.com/spf13/viper"
-	"github.com/iris-contrib/template/django"
 )
 
-var ws iris.WebsocketServer
 var sokets []iris.WebsocketConnection
 
 func main() {
@@ -30,12 +29,11 @@ func main() {
 	iris.Get("/", index)
 	iris.Get("/run/:index", run)
 	iris.Config.Websocket.Endpoint = "/ws"
-	ws = iris.Websocket
-	ws.OnConnection(func(c iris.WebsocketConnection) {
+	iris.Websocket.OnConnection(func(c iris.WebsocketConnection) {
 		sokets = append(sokets, c)
 		c.EmitMessage([]byte("connected"))
 	})
-	iris.Listen("0.0.0.0:80")
+	iris.Listen("0.0.0.0:" + viper.GetString("port"))
 }
 
 func index(ctx *iris.Context) {
